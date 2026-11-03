@@ -1,0 +1,9 @@
+{
+  "name": "auto-personal-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh": "node scripts/refresh-content.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}

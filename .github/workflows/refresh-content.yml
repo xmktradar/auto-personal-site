@@ -1,0 +1,33 @@
+# 定時（同手動）跑內容 refresh stub，commit 返 repo，觸發 Deploy
+name: Refresh content
+on:
+  schedule:
+    # 每日 01:05 UTC ≈ 09:05 HKT
+    - cron: "5 1 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: refresh-content
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run AI pipeline stub (no external APIs)
+        run: npm run refresh
+      - name: Commit refreshed content
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/ai-generated.json
+          if git diff --staged --quiet; then
+            echo "No content change"
+          else
+            git commit -m "chore: refresh AI content stub $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
