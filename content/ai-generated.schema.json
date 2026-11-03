@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/xmktradar/auto-personal-site/content/ai-generated.schema.json",
+  "title": "AI-generated site content",
+  "type": "object",
+  "required": ["last_refreshed_hkt", "items"],
+  "additionalProperties": true,
+  "properties": {
+    "note": { "type": "string" },
+    "last_refreshed_hkt": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Timestamp in Asia/Hong_Kong, e.g. 2026-11-03 21:38"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "body"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "body": { "type": "string", "minLength": 1 },
+          "source": { "type": "string" }
+        }
+      }
+    }
+  }
+}

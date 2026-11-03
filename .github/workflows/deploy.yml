@@ -1,29 +1,46 @@
-# 每次 push 到 main：建置靜態站並部署到 GitHub Pages
+# Build + GitHub Pages deploy.
+# Triggers: push to main, manual, OR after "Refresh content" succeeds (workflow_run).
+# Why workflow_run: default GITHUB_TOKEN commits do NOT re-trigger workflows on push.
 name: Deploy site
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Refresh content"]
+    types: [completed]
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: true
+
 jobs:
   build:
+    # Skip redeploy when the refresh workflow failed
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (refresh HEAD when chained)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Validate ingest JSON
+        run: npm run validate
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     needs: build
     runs-on: ubuntu-latest
     environment:

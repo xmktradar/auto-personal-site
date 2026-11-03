@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "refresh": "node scripts/refresh-content.mjs",
+    "validate": "node scripts/validate-content.mjs",
     "build": "node scripts/build.mjs"
   }
 }

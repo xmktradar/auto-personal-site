@@ -1,15 +1,19 @@
-# 定時（同手動）跑內容 refresh stub，commit 返 repo，觸發 Deploy
+# Scheduled / manual content refresh. Commits JSON with GITHUB_TOKEN.
+# Deploy is NOT expected from this push — Deploy site listens via workflow_run.
 name: Refresh content
 on:
   schedule:
-    # 每日 01:05 UTC ≈ 09:05 HKT
+    # Daily 01:05 UTC ≈ 09:05 HKT
     - cron: "5 1 * * *"
   workflow_dispatch:
+
 permissions:
   contents: write
+
 concurrency:
   group: refresh-content
   cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -18,16 +22,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Run AI pipeline stub (no external APIs)
+      - name: Run content refresh (stub unless API secret set)
+        env:
+          # Optional later: repo secret XAI_API_KEY or GROK_API_KEY
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         run: npm run refresh
+      - name: Validate ingest JSON
+        run: npm run validate
       - name: Commit refreshed content
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add content/ai-generated.json
           if git diff --staged --quiet; then
-            echo "No content change"
+            echo "No content change — Deploy may still chain via workflow_run (same SHA)."
           else
-            git commit -m "chore: refresh AI content stub $(date -u +%Y-%m-%dT%H:%MZ)"
+            git commit -m "chore: refresh AI content $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
           fi
