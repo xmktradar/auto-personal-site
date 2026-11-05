@@ -1,6 +1,8 @@
 # Build + GitHub Pages deploy.
 # Triggers: push to main, manual, OR after "Refresh content" succeeds (workflow_run).
 # Why workflow_run: default GITHUB_TOKEN commits do NOT re-trigger workflows on push.
+# Checkout tip of the refresh branch (not workflow_run.head_sha): head_sha is the
+# pre-commit SHA Refresh started on, so building it leaves Pages one refresh behind.
 name: Deploy site
 on:
   push:
@@ -25,10 +27,10 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (refresh HEAD when chained)
+      - name: Checkout (branch tip after Refresh commit)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.event.workflow_run.head_branch || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
