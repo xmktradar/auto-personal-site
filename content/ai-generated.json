@@ -1,11 +1,11 @@
 {
   "note": "AI 內容槽。SuperGrok／外部 AI 只負責產出 JSON；GitHub Actions 負責 ingest／build／Pages。現階段 stub，唔打外部 API。",
-  "last_refreshed_hkt": "2026-11-07 15:00",
+  "last_refreshed_hkt": "2026-11-08 15:10",
   "items": [
     {
       "id": "stub-1",
       "title": "佔位標題",
-      "body": "自動 refresh 已跑（stub）。上次：2026-11-07 15:00 HKT。之後由 SuperGrok／Actions 寫入真內容。",
+      "body": "自動 refresh 已跑（stub）。上次：2026-11-08 15:10 HKT。之後由 SuperGrok／Actions 寫入真內容。",
       "source": "pipeline-stub"
     }
   ]
